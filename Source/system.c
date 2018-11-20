@@ -1,27 +1,79 @@
+//------------------------------------------------------------------------------
+// Description:
+//    Reset and Clock Control (RCC)
+//    Direct Memory Access (DMA)
+//    Nested vectored interrupt controller (NVIC)
+//    Independent Watchdog (IWDG)
+//    Window Watchdog (WWDG)
+//    System Timer (Systick)
+//
+//   Subroutines:
+//     system_init
+//     SystemClock_Config
+//     _Error_Handler
+//     assert_failed
+//
+//   Functions:
+//     None
+//
+//   Interrupts:
+//     None
+//
+//
+//------------------------------------------------------------------------------
 
+
+
+//------------------------------------------------------------------------------
+//  Includes Files
+//------------------------------------------------------------------------------
 #include "stm32f4xx.h"
 #include "system.h"
 
 
 
 
-
-
-
-
-
+//------------------------------------------------------------------------------
+// Function Name  : system_init
+// Description    : Initialize
+//                  Configures system peripherals
+// Input          : None
+// Output         : None
+// Return         : None
+//------------------------------------------------------------------------------
 void system_init(void)
 {
 
+	// Hardware Abstraction Layer
 	HAL_Init();
 
-
-
+	// Config RCC
 	SystemClock_Config();
+
+	// DMA Clocks
+	__HAL_RCC_DMA1_CLK_ENABLE();
+	__HAL_RCC_DMA2_CLK_ENABLE();
+
+	// Interrupts (NVIC)
+	HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
+	HAL_NVIC_SetPriority(MemoryManagement_IRQn, 0, 0);
+	HAL_NVIC_SetPriority(BusFault_IRQn, 0, 0);
+	HAL_NVIC_SetPriority(UsageFault_IRQn, 0, 0);
+	HAL_NVIC_SetPriority(SVCall_IRQn, 0, 0);
+	HAL_NVIC_SetPriority(DebugMonitor_IRQn, 0, 0);
+	HAL_NVIC_SetPriority(PendSV_IRQn, 15, 0);
 
 }
 
 
+//------------------------------------------------------------------------------
+// Function Name  : SystemClock_Config
+// Description    : Initialize Clocks
+//                  Configures the different system clocks.
+// Input          : None
+// Output         : None
+// Return         : None
+//------------------------------------------------------------------------------
 void SystemClock_Config(void)
 {
 	RCC_OscInitTypeDef RCC_OscInitStruct;
@@ -70,6 +122,14 @@ void SystemClock_Config(void)
 }
 
 
+//------------------------------------------------------------------------------
+// Task Name      : Error_Handler
+// Description    : report the HAL error return state
+// Input          : char *file,  Source file pointer
+//                  int line,    Line number
+// Output         : None
+// Return         : None
+//------------------------------------------------------------------------------
 void _Error_Handler(char *file, int line)
 {
 
@@ -80,6 +140,16 @@ void _Error_Handler(char *file, int line)
 }
 
 
+//------------------------------------------------------------------------------
+// Function Name  : assert_failed
+// Description    : Initialize Clocks
+//                  Reports the name of the source file and the source line number
+//                  where the assert_param error has occurred.
+// Input          : char *file,  Source file pointer
+//                  int line,    Line number
+// Output         : None
+// Return         : None
+//------------------------------------------------------------------------------
 #ifdef  USE_FULL_ASSERT
 // @brief  Reports the name of the source file and the source line number
 //         where the assert_param error has occurred.
